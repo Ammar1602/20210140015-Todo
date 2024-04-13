@@ -6,9 +6,10 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">=
+        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
-                <div class="px-6 pt-6 mb-5 md:w-1/2 2x1:w-1/3">
+
+                <div class="px-6 py-6 mb-5 md:w-1/2 2x1:w-1/3">
                     @if (request('search'))
                         <h2 class="pb-3 text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
                             Search results for: {{ request('search') }}
@@ -39,6 +40,8 @@
                         </div>
                     </div>
                 </div>
+
+
                 <div class="relative overflow-x-auto">
                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -52,13 +55,13 @@
                         </thead>
                         <tbody>
                             @forelse ($users as $user)
-                                <tr
-                                    class="{{ $loop->odd ? 'odd:bg-white odd:dark:bg-gray-800' : 'even:bg-gray-50 even:dark:bg-gray-700' }}">
+                                <tr class="odd:bg-white odd:dark:bg-gray-800 even:bg-gray-50 even:dark:bg-gray-700">
                                     <td scope="row"
                                         class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                         <p>{{ $user->id }}</p>
                                     </td>
-                                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    <td
+                                        class="px-6 py-4 font-medium text-gray-900 md:whitespace-nowrap dark:text-white">
                                         <p>{{ $user->name }}</p>
                                     </td>
                                     <td class="hidden px-6 py-4 md:block">
@@ -68,39 +71,65 @@
                                         <p>{{ $user->todos->count() }}
                                             <span>
                                                 <span class="text-green-600 dark:text-green-400">
-                                                    {{ $user->todos->where('is_complete', true)->count() }}
+                                                    ({{ $user->todos->where('is_complete', true)->count() }})
                                                 </span>
+                                                /
                                                 <span class="text-blue-600 dark:text-blue-400">
-                                                    {{ $user->todos->where('is_complete', false)->count() }}
+                                                    ({{ $user->todos->where('is_complete', false)->count() }})
                                                 </span>
                                             </span>
                                         </p>
                                     </td>
-
                                     <td class="px-6 py-4">
                                         <div class="flex space-x-3">
-                                            {{-- Action Here --}}
+                                            <!-- Action here -->
+                                            @if ($user->is_admin)
+                                        <form action="{{ route('user.removeadmin', $user) }}" method="Post">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit"
+                                                class="text-blue-600 dark:text-blue-400 whitespace-nowrap">
+                                                Remove Admin
+                                            </button>
+                                        </form>
+                                        @else
+                                        <form action="{{ route('user.makeadmin', $user) }}" method="Post">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit"
+                                                class="text-red-600 dark:text-red-400 whitespace-nowrap">
+                                                Make Admin
+                                            </button>
+                                        </form>
+                                        @endif
+                                        <form action="{{ route('user.destroy', $user) }}" method="Post">
+                                            @csrf
+                                            @method('delete')
+                                            <button type="submit"
+                                                class="text-red-600 dark:text-red-400 whitespace-nowrap">
+                                                Delete
+                                            </button>
+                                        </form>
                                         </div>
                                     </td>
                                 </tr>
                             @empty
                                 <tr class="bg-white dark:bg-gray-800">
-                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                                        Empty
+                                    <td scope="row" class="px-6 py-4 font-medium text-gray-900 dark:text-white">Empty
                                     </td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
+
                 @if ($users->hasPages())
                     <div class="p-6">
                         {{ $users->links() }}
                     </div>
                 @endif
-                {{-- <div class="p-6 text-gray-900 dark:text-gray-100">
-                    {{ __("Index User Page") }}
-                </div> --}}
+
+
             </div>
         </div>
     </div>
